@@ -74,6 +74,9 @@ export default function CacCheckoutScreen({ navigation }) {
           <Row l={delivery ? 'Livraison' : 'Retrait'} r={fee ? fmt(fee) : 'Gratuit'} />
           <Row l="Total à payer" r={fmt(subtotal + fee)} bold />
           <Text style={{ color: C.mute, fontSize: 11, marginTop: 8, lineHeight: 16 }}>
+            {lines.some((l) => l.offerId)
+              ? 'Lots en offre : si le seuil de parts n’est pas atteint à la clôture, vous êtes remboursé en totalité. '
+              : ''}
             Si un palier de remise est atteint à la clôture du cycle, la différence vous est remboursée.
             En cas d’indisponibilité d’un produit, il est remboursé.
           </Text>

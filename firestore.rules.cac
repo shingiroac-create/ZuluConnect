@@ -36,3 +36,8 @@
         && request.resource.data.orgName.size() > 0;
       allow update, delete: if false;
     }
+
+    match /cac_offers/{id} {
+      allow read: if true;
+      allow write: if false;            // offres publiées par l'équipe CAC (puis fournisseurs, plus tard)
+    }

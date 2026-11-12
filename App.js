@@ -10,6 +10,8 @@ import CacCatalogScreen from './screen/cac/CacCatalogScreen';
 import CacCheckoutScreen from './screen/cac/CacCheckoutScreen';
 import CacOrdersScreen from './screen/cac/CacOrdersScreen';
 import CacB2BScreen from './screen/cac/CacB2BScreen';
+import CacOffersScreen from './screen/cac/CacOffersScreen';
+import CacOfferScreen from './screen/cac/CacOfferScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +25,8 @@ export default function App() {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="CacHome" component={CacHomeScreen} />
+            <Stack.Screen name="CacOffers" component={CacOffersScreen} />
+            <Stack.Screen name="CacOffer" component={CacOfferScreen} />
             <Stack.Screen name="CacCatalog" component={CacCatalogScreen} />
             <Stack.Screen name="CacCheckout" component={CacCheckoutScreen} />
             <Stack.Screen name="CacOrders" component={CacOrdersScreen} />

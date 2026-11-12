@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
-import { ORDER_STEPS, fmt } from '../../cac/data';
+import { ORDER_STEPS, fmt, savingsFromOrders } from '../../cac/data';
 import { subscribeMyOrders } from '../../cac/services';
 import { C, Card, Screen } from '../../cac/ui';
 
@@ -19,6 +19,12 @@ export default function CacOrdersScreen({ navigation }) {
         data={orders}
         keyExtractor={(o) => o.id}
         contentContainerStyle={{ padding: 16 }}
+        ListHeaderComponent={savingsFromOrders(orders) > 0 ? (
+          <Card style={{ borderColor: 'rgba(0,229,160,0.25)' }}>
+            <Text style={{ color: C.mute, fontSize: 12 }}>Vos économies avec CAC</Text>
+            <Text style={{ color: C.green, fontSize: 22, fontWeight: '800' }}>{fmt(savingsFromOrders(orders))}</Text>
+          </Card>
+        ) : null}
         ListEmptyComponent={<Text style={{ color: C.mute, textAlign: 'center', marginTop: 40 }}>Aucune commande pour le moment.</Text>}
         renderItem={({ item: o }) => {
           const idx = Math.max(0, ORDER_STEPS.findIndex((s) => s.key === o.status));

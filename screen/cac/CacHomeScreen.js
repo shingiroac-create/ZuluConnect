@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { BASKETS, currentTier, daysLeft, fmt } from '../../cac/data';
+import { BASKETS, currentTier, daysLeft, fmt, savingsFromOrders } from '../../cac/data';
+import { subscribeMyOrders } from '../../cac/services';
+import OfferCard from './OfferCard';
 import { basketTotal, useCac } from '../../cac/CacContext';
 import { Btn, C, Card, Label, Progress, Screen, Segment } from '../../cac/ui';
 
 const TABS = ['Ménages', 'Entreprises & ONG'];
 
 export default function CacHomeScreen({ navigation }) {
-  const { cycle, products, loadBasket } = useCac();
+  const { cycle, products, offers, loadBasket } = useCac();
+  const [saved, setSaved] = useState(0);
+  useEffect(() => subscribeMyOrders((o) => setSaved(savingsFromOrders(o))), []);
   const [tab, setTab] = useState(TABS[0]);
   const { reached, next, max } = currentTier(cycle);
   const left = daysLeft(cycle);
@@ -24,6 +28,19 @@ export default function CacHomeScreen({ navigation }) {
 
         {tab === TABS[0] ? (
           <View style={{ marginTop: 16 }}>
+            <Card style={st.saveCard}>
+              <Text style={st.saveLbl}>Vos économies avec CAC</Text>
+              <Text style={st.saveVal}>{fmt(saved)}</Text>
+              {saved === 0 ? <Text style={st.mute}>Rejoignez un lot ci-dessous pour commencer à économiser.</Text> : null}
+            </Card>
+
+            <Label>Offres du moment</Label>
+            {offers.slice(0, 3).map((o) => (
+              <OfferCard key={o.id} offer={o} onPress={() => navigation.navigate('CacOffer', { offerId: o.id })} />
+            ))}
+            <Btn label="Voir toutes les offres →" kind="ghost" onPress={() => navigation.navigate('CacOffers')} style={{ marginBottom: 16 }} />
+
+            <Label>Cycle d'achat mensuel</Label>
             <Card>
               <View style={st.row}>
                 <Text style={st.cycleTitle}>{cycle.title}</Text>
@@ -85,6 +102,9 @@ const st = StyleSheet.create({
   mute: { fontSize: 12, color: C.mute, lineHeight: 18 },
   pill: { backgroundColor: 'rgba(0,229,160,0.1)', borderWidth: 1, borderColor: 'rgba(0,229,160,0.25)', borderRadius: 20, paddingVertical: 4, paddingHorizontal: 10 },
   pillTxt: { color: C.green, fontSize: 11, fontWeight: '700' },
+  saveCard: { borderColor: 'rgba(0,229,160,0.25)', backgroundColor: '#0a1f18' },
+  saveLbl: { fontSize: 11, color: 'rgba(0,229,160,0.7)', letterSpacing: 1.2, textTransform: 'uppercase' },
+  saveVal: { fontSize: 30, fontWeight: '800', color: C.text, marginVertical: 4 },
   demo: { marginTop: 8, fontSize: 10, color: C.gold },
   basket: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   basketIc: { fontSize: 28 },

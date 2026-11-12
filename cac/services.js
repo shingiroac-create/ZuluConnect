@@ -6,7 +6,7 @@ import {
   addDoc, collection, onSnapshot, query, serverTimestamp, where,
 } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-import { DEMO_CYCLE, DEMO_PRODUCTS } from './data';
+import { DEMO_CYCLE, DEMO_OFFERS, DEMO_PRODUCTS } from './data';
 
 const toDate = (v) => (v?.toDate ? v.toDate() : v ? new Date(v) : null);
 const byDateDesc = (a, b) =>
@@ -37,6 +37,17 @@ export function subscribeProducts(cb) {
       cb(list.length ? list : DEMO_PRODUCTS);
     },
     () => cb(DEMO_PRODUCTS)
+  );
+}
+
+export function subscribeOffers(cb) {
+  return onSnapshot(
+    query(collection(db, 'cac_offers'), where('status', '==', 'open')),
+    (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data(), closesAt: toDate(d.data().closesAt) }));
+      cb(list.length ? list : DEMO_OFFERS);
+    },
+    () => cb(DEMO_OFFERS)
   );
 }
 
@@ -80,7 +91,8 @@ export async function placeOrder({ cycle, lines, delivery, payment, referralCode
   const base = {
     cycleId: cycle.id,
     items: lines.map((l) => ({
-      productId: l.id, name: l.name, unit: l.unit, qty: l.qty, unitPrice: l.price,
+      productId: l.offerId ? null : l.id, offerId: l.offerId || null, name: l.name, unit: l.unit,
+      qty: l.qty, unitPrice: l.price, refPrice: l.refPrice || null,
     })),
     subtotal: lines.reduce((s, l) => s + l.price * l.qty, 0),
     deliveryFee: delivery.fee,

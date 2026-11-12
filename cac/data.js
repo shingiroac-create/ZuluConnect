@@ -99,3 +99,44 @@ export function daysLeft(cycle) {
   const ms = new Date(cycle.closesAt).getTime() - Date.now();
   return Math.max(0, Math.ceil(ms / (24 * 3600 * 1000)));
 }
+
+// ---- Offres (façon covoiturage) -------------------------------------------
+// Une offre = un lot publié avec un prix de groupe, un seuil de parts et une date limite.
+// Seuil atteint à la date limite : l'achat est lancé. Sinon : remboursement.
+// Valeurs de démonstration : à remplacer par des devis fournisseurs datés (collection cac_offers).
+export const MAX_PARTS_PER_HOUSEHOLD = 5;
+
+export const DEMO_OFFERS = [
+  { id: 'o-haricots', emoji: '🫘', name: 'Haricots', unit: 'sac de 50 kg', price: 115000, groupPrice: 102000, minParts: 80, parts: 77, closesAt: inDays(2), zone: 'Bujumbura', pickupPoint: 'Point relais Kamenge', supplier: 'Sélectionné par CAC' },
+  { id: 'o-riz', emoji: '🍚', name: 'Riz', unit: 'sac de 25 kg', price: 62000, groupPrice: 55000, minParts: 100, parts: 64, closesAt: inDays(3), zone: 'Bujumbura', pickupPoint: 'Point relais Ngagara', supplier: 'Sélectionné par CAC' },
+  { id: 'o-huile', emoji: '🛢️', name: 'Huile végétale', unit: 'bidon de 20 L', price: 135000, groupPrice: 120000, minParts: 60, parts: 41, closesAt: inDays(5), zone: 'Bujumbura', pickupPoint: 'Point relais Rohero', supplier: 'Sélectionné par CAC' },
+  { id: 'o-sucre', emoji: '🍬', name: 'Sucre', unit: 'sac de 25 kg', price: 85000, groupPrice: 76000, minParts: 50, parts: 12, closesAt: inDays(7), zone: 'Bujumbura', pickupPoint: 'Point relais Musaga', supplier: 'Sélectionné par CAC' },
+  { id: 'o-savon', emoji: '🧼', name: 'Savon de ménage', unit: 'carton de 24', price: 36000, groupPrice: 32000, minParts: 40, parts: 46, closesAt: inDays(4), zone: 'Bujumbura', pickupPoint: 'Point relais Kinindo', supplier: 'Sélectionné par CAC' },
+];
+
+DEMO_OFFERS.forEach((o) => { o.demo = true; });
+
+export const offerPct = (o) => Math.round((1 - o.groupPrice / o.price) * 100);
+export const offerSaving = (o, parts = 1) => (o.price - o.groupPrice) * parts;
+export const offerConfirmed = (o) => o.parts >= o.minParts;
+export const offerMissing = (o) => Math.max(0, o.minParts - o.parts);
+
+export const OFFER_FILTERS = ['Toutes', 'Presque complètes', 'Bientôt clôturées'];
+export function filterOffers(list, filter) {
+  if (filter === 'Presque complètes') {
+    return list.filter((o) => !offerConfirmed(o) && o.parts / o.minParts >= 0.7)
+      .sort((a, b) => b.parts / b.minParts - a.parts / a.minParts);
+  }
+  if (filter === 'Bientôt clôturées') {
+    return [...list].sort((a, b) => new Date(a.closesAt) - new Date(b.closesAt)).slice(0, 3);
+  }
+  return list;
+}
+
+export function savingsFromOrders(orders) {
+  return orders.reduce(
+    (sum, o) => sum + (o.items || []).reduce(
+      (s, i) => s + (i.refPrice ? (i.refPrice - i.unitPrice) * i.qty : 0), 0),
+    0
+  );
+}
