@@ -26,6 +26,14 @@ export default function HomeScreen({ navigation }) {
           <TouchableOpacity style={styles.actBtn}><Text style={styles.actIc}>🌍</Text><Text style={styles.actLbl}>Impact</Text></TouchableOpacity>
           <TouchableOpacity style={styles.actBtn}><Text style={styles.actIc}>💸</Text><Text style={styles.actLbl}>Wallet</Text></TouchableOpacity>
         </View>
+        <TouchableOpacity style={styles.cacCard} onPress={() => navigation.navigate('CacHome')}>
+          <Text style={styles.cacIc}>🛒</Text>
+          <View style={{flex:1}}>
+            <Text style={styles.cacTitle}>Achats groupés CAC</Text>
+            <Text style={styles.cacSub}>Riz, huile, haricots… moins chers ensemble. Ménages et organisations.</Text>
+          </View>
+          <Text style={styles.cacGo}>→</Text>
+        </TouchableOpacity>
         <View style={styles.section}>
           <Text style={styles.secTitle}>Campagnes actives</Text>
           {[{ic:'📱',name:'Safaricom 5G',earn:'300 BIF'},{ic:'🎓',name:'BujaHub Academy',earn:'500 BIF'},{ic:'💳',name:'Lumicash Pay',earn:'200 BIF'}].map((c,i) => (
@@ -63,6 +71,11 @@ const styles = StyleSheet.create({
   actBtn:{flex:1,backgroundColor:'#0f1420',borderWidth:1,borderColor:'rgba(255,255,255,0.07)',borderRadius:16,padding:14,alignItems:'center',gap:6},
   actIc:{fontSize:22},
   actLbl:{fontSize:11,color:'#8890a8'},
+  cacCard:{flexDirection:'row',alignItems:'center',gap:12,marginHorizontal:16,marginBottom:20,backgroundColor:'#0a1f18',borderWidth:1,borderColor:'rgba(0,229,160,0.25)',borderRadius:18,padding:16},
+  cacIc:{fontSize:28},
+  cacTitle:{fontSize:15,fontWeight:'800',color:'#e8eaf0'},
+  cacSub:{fontSize:12,color:'#8890a8',marginTop:2,lineHeight:17},
+  cacGo:{fontSize:20,color:'#00E5A0',fontWeight:'800'},
   section:{paddingHorizontal:16,marginBottom:20},
   secTitle:{fontSize:16,fontWeight:'700',color:'#e8eaf0',marginBottom:12},
   camp:{backgroundColor:'#0f1420',borderWidth:1,borderColor:'rgba(255,255,255,0.07)',borderRadius:16,padding:14,flexDirection:'row',alignItems:'center',gap:12,marginBottom:10},

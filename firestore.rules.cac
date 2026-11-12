@@ -1,0 +1,38 @@
+// Règles Firestore PROPOSÉES pour le module CAC.
+// À FUSIONNER dans les règles existantes du projet zuluconnect-b3d81 (ne pas écraser
+// celles des autres collections). Collage dans : match /databases/{database}/documents { ... }
+
+    match /cac_cycles/{id} {
+      allow read: if true;
+      allow write: if false;            // géré par l'équipe CAC / back-office
+    }
+
+    match /cac_products/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /cac_orders/{id} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'awaiting_payment'
+        && request.resource.data.paymentStatus == 'pending'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.total is number
+        && request.resource.data.total > 0;
+      allow update, delete: if false;   // statuts mis à jour par le back-office uniquement
+    }
+
+    match /cac_b2b_requests/{id} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'nouvelle'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.orgName is string
+        && request.resource.data.orgName.size() > 0;
+      allow update, delete: if false;
+    }
